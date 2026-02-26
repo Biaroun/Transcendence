@@ -31,7 +31,7 @@ services:
       context: ./requirements/frontend
       dockerfile: Dockerfile
       args:
-        VITE_DOMAIN_NAME: 'c3r2p3'
+        VITE_DOMAIN_NAME: 'localhost'
         VITE_PORT_NUM: 4343
     healthcheck:
       test: ["CMD", "curl", "-f", "http://frontend:3000/health"]

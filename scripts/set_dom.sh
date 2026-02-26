@@ -15,7 +15,7 @@ if [ -z "$NEW_DOMAIN_NAME" ]; then
     exit 1
 fi
 
-#NEW_DOMAIN_NAME="'localhost'" #a retirer a 42
+NEW_DOMAIN_NAME="'localhost'" # commenter cette ligne a 42
 
 if grep -q "^DOMAIN_NAME=" "$ENV_FILE"; then
     sed -i "s/^DOMAIN_NAME=.*/DOMAIN_NAME=$NEW_DOMAIN_NAME/" "$ENV_FILE"
