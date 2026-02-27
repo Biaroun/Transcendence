@@ -23,7 +23,7 @@ COPY --chown=root:root ./conf/manage.py .
 RUN	python3 -m venv .env \
 	&& source $ENV_DIR \
 	&& pip install --upgrade pip \
-	&& pip install -r requirements.txt
+	&& pip install --verbose -r requirements.txt
 
 RUN source $ENV_DIR \
 	&& python3 manage.py startapp core

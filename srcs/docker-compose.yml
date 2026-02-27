@@ -48,7 +48,6 @@ services:
   service_user_handler_django:
     depends_on:
       - service_user_handler_postgresql
-      - vault
     build:
       context: ./requirements/service_user_handler/django
       dockerfile: Dockerfile
@@ -59,7 +58,7 @@ services:
     container_name: service_user_handler_django
     environment:
       - DJANGO_SETTINGS_MODULE=django_user_handler.settings
-    env_file: ./env/.env_nginx
+    env_file: ./env/.env_user_handler_django
     init: true
     restart: always
     networks:
@@ -69,27 +68,23 @@ services:
     volumes:
       - static_media:/django_web_app/media
       - static_users:/django_web_app/staticfiles
-      - secrets_user_handler_django:/django_web_app/user_handler_django
 
   service_user_handler_postgresql:
     build:
       context: ./requirements/service_user_handler/postgresql
       dockerfile: Dockerfile
     container_name: service_user_handler_postgresql
+    env_file: ./env/.env_user_handler_postgres
     init: true
     restart: always
     networks:
       network:
         ipv4_address: 172.20.0.41
     hostname: service_user_handler_postgresql
-    volumes:
-      - secrets_user_handler_postgres:/etc/postgresql/user_handler_postgres
-      - secrets_game_pong_postgres:/etc/postgresql/game_pong_postgres
 
   service_game_pong_django:
     depends_on:
       - service_game_pong_postgresql
-      - vault
     build:
       context: ./requirements/service_game_pong/django
       dockerfile: Dockerfile
@@ -100,7 +95,7 @@ services:
     container_name: service_game_pong_django
     environment:
       - DJANGO_SETTINGS_MODULE=django_game_pong.settings
-    env_file: ./env/.env_nginx
+    env_file: ./env/.env_game_pong_django
     init: true
     restart: always
     networks:
@@ -109,27 +104,23 @@ services:
     hostname: service_game_pong_django
     volumes:
       - static_pong:/django_web_app/staticfiles
-      - secrets_game_pong_django:/django_web_app/game_pong_django
 
   service_game_pong_postgresql:
     build:
       context: ./requirements/service_game_pong/postgresql
       dockerfile: Dockerfile
     container_name: service_game_pong_postgresql
+    env_file: ./env/.env_game_pong_postgres
     init: true
     restart: always
     networks:
       network:
         ipv4_address: 172.20.0.43
     hostname: service_game_pong_postgresql
-    volumes:
-      - secrets_game_pong_postgres:/etc/postgresql/game_pong_postgres
-      - secrets_user_handler_postgres:/etc/postgresql/user_handler_postgres
 
   service_live_chat_django:
     depends_on:
       - service_live_chat_postgresql
-      - vault
     build:
       context: ./requirements/service_live_chat/django
       dockerfile: Dockerfile
@@ -140,7 +131,7 @@ services:
     container_name: service_live_chat_django
     environment:
       - DJANGO_SETTINGS_MODULE=django_live_chat.settings
-    env_file: ./env/.env_nginx
+    env_file: ./env/.env_live_chat_django
     init: true
     restart: always
     networks:
@@ -149,47 +140,19 @@ services:
     hostname: service_live_chat_django
     volumes:
       - static_live_chat:/django_web_app/staticfiles
-      - secrets_live_chat_django:/django_web_app/live_chat_django
 
   service_live_chat_postgresql:
     build:
       context: ./requirements/service_live_chat/postgresql
       dockerfile: Dockerfile
     container_name: service_live_chat_postgresql
+    env_file: ./env/.env_live_chat_postgres
     init: true
     restart: always
     networks:
       network:
         ipv4_address: 172.20.0.45
     hostname: service_live_chat_postgresql
-    volumes:
-      - secrets_user_handler_postgres:/etc/postgresql/user_handler_postgres
-      - secrets_live_chat_postgres:/etc/postgresql/live_chat_postgres
-      - secrets_game_pong_postgres:/etc/postgresql/game_pong_postgres
-
-  vault:
-    build:
-      context: ./requirements/hashicorp_vault/vault
-      dockerfile: Dockerfile
-    container_name: vault_secrets
-    init: true
-    restart: always
-    networks:
-      network:
-        ipv4_address: 172.20.0.9
-    environment:
-      - VAULT_ADDR=http://172.20.0.9:8200
-      - VAULT_SKIP_VERIFY=true
-    hostname: vault
-    cap_add:
-      - IPC_LOCK
-    volumes:
-      - secrets_user_handler_django:/vault/clients_tokens/user_handler_django
-      - secrets_user_handler_postgres:/vault/clients_tokens/user_handler_postgres
-      - secrets_game_pong_django:/vault/clients_tokens/game_pong_django
-      - secrets_game_pong_postgres:/vault/clients_tokens/game_pong_postgres
-      - secrets_live_chat_django:/vault/clients_tokens/live_chat_django
-      - secrets_live_chat_postgres:/vault/clients_tokens/live_chat_postgres
 
 networks:
   network:
@@ -203,9 +166,3 @@ volumes:
   static_media:
   static_pong:
   static_live_chat:
-  secrets_user_handler_django:
-  secrets_user_handler_postgres:
-  secrets_game_pong_django:
-  secrets_game_pong_postgres:
-  secrets_live_chat_django:
-  secrets_live_chat_postgres:

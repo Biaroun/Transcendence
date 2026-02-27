@@ -1,12 +1,10 @@
 #!/bin/sh
 set -e
 
-VAULT_TOKEN=$(cat /etc/postgresql/live_chat_postgres/live_chat_postgres)
-
-# Secrets extraction
-PG_NAME=$(curl -q --silent --header "X-Vault-Token: $VAULT_TOKEN" http://vault:8200/v1/secret/live_chat/postgres/postgres_database_name | jq -r ".data.postgres_database_name")
-PG_USER=$(curl -q --silent --header "X-Vault-Token: $VAULT_TOKEN" http://vault:8200/v1/secret/live_chat/postgres/postgres_user | jq -r ".data.postgres_user")
-PG_PASSWORD=$(curl -q --silent --header "X-Vault-Token: $VAULT_TOKEN" http://vault:8200/v1/secret/live_chat/postgres/postgres_password | jq -r ".data.postgres_password")
+# Secrets extraction from environment variables
+PG_NAME=$POSTGRES_DB
+PG_USER=$POSTGRES_USER
+PG_PASSWORD=$POSTGRES_PASSWORD
 
 sed -i "s/PG_NAME/$PG_NAME/g" /var/lib/postgresql/data/pg_hba.conf
 sed -i "s/PG_USER/$PG_USER/g" /var/lib/postgresql/data/pg_hba.conf

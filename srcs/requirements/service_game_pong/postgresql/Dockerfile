@@ -6,8 +6,9 @@ RUN apk update \
 	&& apk upgrade \
 	&& apk add postgresql vim curl jq
 
-RUN mkdir /etc/postgresql/game_pong_postgres
+RUN mkdir /etc/postgresql/live_chat_postgres
 RUN mkdir /etc/postgresql/user_handler_postgres
+RUN mkdir /etc/postgresql/game_pong_postgres
 
 RUN mkdir /run/postgresql \
 	&& chown postgres:postgres /run/postgresql \

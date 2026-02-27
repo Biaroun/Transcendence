@@ -12,18 +12,16 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
-from utils.vault_utils import get_vault_secrets
 import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-vault_secrets = get_vault_secrets()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = vault_secrets['django_secret_key']
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 DOMAIN_NAME = os.getenv("DOMAIN_NAME", "localhost")
 PORT_NUM = os.getenv("PORT_NUM", "4343")
 
@@ -99,11 +97,11 @@ CHANNEL_LAYERS = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': vault_secrets['postgres_database_name'],            # Nom de ta base de données
-        'USER': vault_secrets['postgres_user'],          # Nom d'utilisateur PostgreSQL
-        'PASSWORD': vault_secrets['postgres_password'],  # Mot de passe PostgreSQL
-        'HOST': vault_secrets['postgres_host'],          # Si tu es en local, sinon 'db' avec Docker
-        'PORT': vault_secrets['postgres_port'],          # Port par défaut de PostgreSQL
+        'NAME': os.environ.get('POSTGRES_DB'),
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'HOST': os.environ.get('POSTGRES_HOST'),
+        'PORT': os.environ.get('POSTGRES_PORT'),
         'CONN_MAX_AGE':None,
         'CONN_HEALTH_CHECKS':True,
     }

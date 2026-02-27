@@ -14,38 +14,7 @@ RUN openssl req -x509 -nodes \
 	-keyout /etc/nginx/ssl/transcendence.key \
 	-subj "/C=FR/ST=Alpes-Maritimes/L=Nice/O=Ecole\ 42/OU=Ecole/CN=localhost/emailAddress=mcordes@student.42nice.fr"
 
-WORKDIR /home
-RUN git clone https://github.com/owasp-modsecurity/ModSecurity.git \
-	&& cd /home/ModSecurity \
-	&& git submodule init \
-	&& git submodule update \
-	&& ./build.sh \
-	&& ./configure --with-pcre2 \
-	&& make \
-	&& make install \
-	&& cd /home \
-	&& git clone https://github.com/owasp-modsecurity/ModSecurity-nginx.git \
-	&& wget http://nginx.org/download/nginx-1.27.1.tar.gz \
-	&& tar zxvf nginx-1.27.1.tar.gz \
-	&& cd /home/nginx-1.27.1 \
-	&& ./configure --with-compat --add-dynamic-module=/home/ModSecurity-nginx \
-	&& make modules \
-	&& cp objs/ngx_http_modsecurity_module.so /etc/nginx/modules/ \
-	&& mkdir /etc/nginx/modsec \
-	&& cd /etc/nginx/modsec \
-	&& cp /home/ModSecurity/modsecurity.conf-recommended /etc/nginx/modsec/modsecurity.conf \
-	&& cp /home/ModSecurity/unicode.mapping /etc/nginx/modsec/ \
-	&& sed -i "s/SecRuleEngine\ DetectionOnly/SecRuleEngine\ On/" modsecurity.conf \
-	&& cd /home \
-	&& git clone https://github.com/coreruleset/coreruleset.git \
-	&& mv coreruleset/ /usr/local/ \
-	&& cd /usr/local/coreruleset \
-	&& cp crs-setup.conf.example crs-setup.conf \
-	&& cd /etc/nginx/modsec \
-	&& sed -i "s/SecAuditEngine RelevantOnly/SecAuditEngine on/" modsecurity.conf
 
-WORKDIR /etc/nginx/modsec
-COPY --chown=root:root ./conf/main.conf ./main.conf
 
 WORKDIR /etc/nginx
 COPY --chown=root:root ./conf/nginx.conf ./nginx.conf
